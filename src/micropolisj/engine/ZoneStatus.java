@@ -27,4 +27,6 @@ public class ZoneStatus
 	public int pollution;
 	/** Number from 17 to 20, 17=Declining, 18=Stable, etc. */
 	public int growthRate;
+	/** Number from 81 to 108 */
+	public int sellValue;
 }

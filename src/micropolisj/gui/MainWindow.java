@@ -1046,6 +1046,12 @@ public class MainWindow extends JFrame
 		gridBox.add(b6,c);
 
 		b6.add(makeToolBtn(MicropolisTool.AIRPORT));
+		
+		// add the sell button to a new row at the end
+		c.gridy++;
+		Box b7 = new Box(BoxLayout.X_AXIS);
+		gridBox.add(b7,c);
+		b7.add(makeToolBtn(MicropolisTool.SELL));
 
 		// add glue to make all elements align toward top
 		c.gridy++;
@@ -1107,6 +1113,16 @@ public class MainWindow extends JFrame
 		ZoneStatus z = engine.queryZoneStatus(xpos, ypos);
 		notificationPane.showZoneStatus(engine, xpos, ypos, z);
 	}
+	// copied from doQueryTool
+	void doSellTool(int xpos, int ypos)
+	{
+		if (!engine.testBounds(xpos, ypos))
+			return;
+
+		ZoneStatus z = engine.queryZoneStatus(xpos, ypos);
+		notificationPane.showZoneValues(engine, xpos, ypos, z);		
+	}
+
 
 	private void doZoom(int dir, Point mousePt)
 	{
@@ -1160,6 +1176,7 @@ public class MainWindow extends JFrame
 		if (ev.getButton() == MouseEvent.BUTTON3) {
 			CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
 			doQueryTool(loc.x, loc.y);
+			//doSellTool(loc.x, loc.y);
 			return;
 		}
 
@@ -1176,6 +1193,11 @@ public class MainWindow extends JFrame
 		if (currentTool == MicropolisTool.QUERY) {
 			doQueryTool(x, y);
 			this.toolStroke = null;
+		}
+		else if (currentTool == MicropolisTool.SELL) {
+			//doSellTool(x, y);
+			this.toolStroke = currentTool.beginStroke(engine, x, y);// finally find out the bug...
+			previewTool();
 		}
 		else {
 			this.toolStroke = currentTool.beginStroke(engine, x, y);
@@ -1254,7 +1276,7 @@ public class MainWindow extends JFrame
 		else if (currentTool == MicropolisTool.QUERY) {
 			doQueryTool(x, y);
 		}
-
+		
 		lastX = x;
 		lastY = y;
 	}
@@ -1265,11 +1287,17 @@ public class MainWindow extends JFrame
 		{
 			drawingArea.setToolCursor(null);
 			return;
-		}
+		}	
+		
 
 		CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
 		int x = loc.x;
 		int y = loc.y;
+		
+		if (currentTool == MicropolisTool.SELL) {
+			doSellTool(x, y);
+		}
+		
 		int w = currentTool.getWidth();
 		int h = currentTool.getHeight();
 

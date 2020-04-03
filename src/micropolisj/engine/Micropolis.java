@@ -2669,7 +2669,16 @@ public class Micropolis
 		z = rateOGMem[ypos/8][xpos/8];
 		z = z < 0 ? 16 : z == 0 ? 17 : z <= 100 ? 18 : 19;
 		zs.growthRate = z + 1;
-
+		
+		z = landValueMem[ypos/2][xpos/2];
+		z = z < 30 ? 4 : z < 80 ? 5 : z < 150 ? 6 : 7;
+		zs.sellValue = 9*z - 36;
+		// I want to loop through the whole 9 tiles, but I need to study more math here.
+		//for (int i = xpos; i < xpos+1; i++) {
+			//for (int j = ypos; j < ypos+1; j++) {
+				//z += landValueMem[i][j];
+			//}
+		//}	        
 		return zs;
 	}
 

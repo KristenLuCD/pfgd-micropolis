@@ -26,6 +26,7 @@ public class NotificationPane extends JPanel
 
 	static final Dimension VIEWPORT_SIZE = new Dimension(160,160);
 	static final Color QUERY_COLOR = new Color(255,165,0);
+	static final Color SELL_COLOR = new Color(217,103,253);
 	static final ResourceBundle strings = MainWindow.strings;
 	static final ResourceBundle mstrings = ResourceBundle.getBundle("micropolisj.CityMessages");
 	static final ResourceBundle s_strings = ResourceBundle.getBundle("micropolisj.StatusMessages");
@@ -153,6 +154,72 @@ public class NotificationPane extends JPanel
 		c1.gridy = ++c2.gridy;
 		p.add(new JLabel(strings.getString("notification.value_lbl")), c1);
 		p.add(new JLabel(landValueStr), c2);
+
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.crime_lbl")), c1);
+		p.add(new JLabel(crimeLevelStr), c2);
+
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.pollution_lbl")), c1);
+		p.add(new JLabel(pollutionStr), c2);
+
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.growth_lbl")), c1);
+		p.add(new JLabel(growthRateStr), c2);
+
+		c1.gridy++;
+		c1.gridwidth = 2;
+		c1.weighty = 1.0;
+		p.add(new JLabel(), c1);
+
+		setVisible(true);
+	}
+	
+	public void showZoneValues(Micropolis engine, int xpos, int ypos, ZoneStatus zone)
+	{
+		headerLbl.setText(strings.getString("notification.sell_hdr"));
+		headerLbl.setBackground(SELL_COLOR);
+
+		String buildingStr = zone.building != -1 ? s_strings.getString("zone."+zone.building) : "";
+		String popDensityStr = s_strings.getString("status."+zone.popDensity);
+		String numValueStr = String.valueOf(zone.sellValue);
+		String sellValueStr = "$ "+numValueStr;
+		String crimeLevelStr = s_strings.getString("status."+zone.crimeLevel);
+		String pollutionStr = s_strings.getString("status."+zone.pollution);
+		String growthRateStr = s_strings.getString("status."+zone.growthRate);
+
+		setPicture(engine, xpos, ypos);
+
+		if (infoPane != null) {
+			mainPane.remove(infoPane);
+			infoPane = null;
+		}
+
+		JPanel p = new JPanel(new GridBagLayout());
+		mainPane.add(p, BorderLayout.CENTER);
+		infoPane = p;
+
+		GridBagConstraints c1 = new GridBagConstraints();
+		GridBagConstraints c2 = new GridBagConstraints();
+
+		c1.gridx = 0;
+		c2.gridx = 1;
+		c1.gridy = c2.gridy = 0;
+		c1.anchor = GridBagConstraints.WEST;
+		c2.anchor = GridBagConstraints.WEST;
+		c1.insets = new Insets(0,0,0,8);
+		c2.weightx = 1.0;
+
+		p.add(new JLabel(strings.getString("notification.zone_lbl")), c1);
+		p.add(new JLabel(buildingStr), c2);
+
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.density_lbl")), c1);
+		p.add(new JLabel(popDensityStr), c2);
+
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.sellValue_lbl")), c1);
+		p.add(new JLabel(sellValueStr), c2);
 
 		c1.gridy = ++c2.gridy;
 		p.add(new JLabel(strings.getString("notification.crime_lbl")), c1);
