@@ -28,5 +28,12 @@ public class ZoneStatus
 	/** Number from 17 to 20, 17=Declining, 18=Stable, etc. */
 	public int growthRate;
 	/** Number from 81 to 108 */
-	public int sellValue;
+	public int sellTotalValue;
+	public int popValue;
+	public int crimeValue;
+	public int sellLandValue;
+	public int pollutionValue;
+	public int growthValue;
+	public int isZone;
+	/** Number from 21 to 22, 21=YES, 22=NO */
 }

@@ -15,6 +15,8 @@ import javax.swing.*;
 
 import micropolisj.engine.*;
 import static micropolisj.gui.ColorParser.parseColor;
+import micropolisj.gui.MainWindow.*;
+import micropolisj.engine.Seller;
 
 public class NotificationPane extends JPanel
 {
@@ -40,7 +42,7 @@ public class NotificationPane extends JPanel
 		headerLbl.setOpaque(true);
 		headerLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		headerLbl.setBorder(BorderFactory.createRaisedBevelBorder());
-		add(headerLbl, BorderLayout.NORTH);
+		add(headerLbl, BorderLayout.NORTH);	
 
 		JButton dismissBtn = new JButton(strings.getString("notification.dismiss"));
 		dismissBtn.addActionListener(new ActionListener() {
@@ -59,7 +61,7 @@ public class NotificationPane extends JPanel
 				BorderFactory.createLineBorder(Color.BLACK)
 				));
 		mainPane.add(viewportContainer, BorderLayout.WEST);
-
+		
 		mapViewport = new JViewport();
 		mapViewport.setPreferredSize(VIEWPORT_SIZE);
 		mapViewport.setMaximumSize(VIEWPORT_SIZE);
@@ -165,8 +167,8 @@ public class NotificationPane extends JPanel
 
 		c1.gridy = ++c2.gridy;
 		p.add(new JLabel(strings.getString("notification.growth_lbl")), c1);
-		p.add(new JLabel(growthRateStr), c2);
-
+		p.add(new JLabel(growthRateStr), c2);		
+		
 		c1.gridy++;
 		c1.gridwidth = 2;
 		c1.weighty = 1.0;
@@ -175,18 +177,22 @@ public class NotificationPane extends JPanel
 		setVisible(true);
 	}
 	
-	public void showZoneValues(Micropolis engine, int xpos, int ypos, ZoneStatus zone)
+	public void showZoneValues(Micropolis engine, MainWindow mainwindow, int xpos, int ypos, ZoneStatus zone)
 	{
 		headerLbl.setText(strings.getString("notification.sell_hdr"));
 		headerLbl.setBackground(SELL_COLOR);
-
+		
+        // follow the pattern to construct a customized message panel with sale information
 		String buildingStr = zone.building != -1 ? s_strings.getString("zone."+zone.building) : "";
-		String popDensityStr = s_strings.getString("status."+zone.popDensity);
-		String numValueStr = String.valueOf(zone.sellValue);
-		String sellValueStr = "$ "+numValueStr;
-		String crimeLevelStr = s_strings.getString("status."+zone.crimeLevel);
-		String pollutionStr = s_strings.getString("status."+zone.pollution);
-		String growthRateStr = s_strings.getString("status."+zone.growthRate);
+		String popDensityStr = String.valueOf(zone.popValue);
+		String landValueStr = "+ $ "+String.valueOf(zone.sellLandValue);
+		String crimeLevelStr = "- $ "+String.valueOf(zone.crimeValue);
+		String pollutionStr = "- $ "+String.valueOf(zone.pollutionValue);
+		String growthRateStr = String.valueOf(zone.growthRate)+"%";
+		String confirmValueStr = "$ "+String.valueOf(zone.sellTotalValue);
+		String aStr = s_strings.getString("status."+zone.isZone);
+	
+		
 
 		setPicture(engine, xpos, ypos);
 
@@ -218,8 +224,8 @@ public class NotificationPane extends JPanel
 		p.add(new JLabel(popDensityStr), c2);
 
 		c1.gridy = ++c2.gridy;
-		p.add(new JLabel(strings.getString("notification.sellValue_lbl")), c1);
-		p.add(new JLabel(sellValueStr), c2);
+		p.add(new JLabel(strings.getString("notification.landValue_lbl")), c1);
+		p.add(new JLabel(landValueStr), c2);
 
 		c1.gridy = ++c2.gridy;
 		p.add(new JLabel(strings.getString("notification.crime_lbl")), c1);
@@ -232,7 +238,21 @@ public class NotificationPane extends JPanel
 		c1.gridy = ++c2.gridy;
 		p.add(new JLabel(strings.getString("notification.growth_lbl")), c1);
 		p.add(new JLabel(growthRateStr), c2);
-
+		
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.newline_lbl")), c1);		
+		
+		c1.gridy = ++c2.gridy;
+		p.add(new JLabel(strings.getString("notification.ask_sell_lbl")), c1);
+		p.add(new JLabel(confirmValueStr), c2);
+		
+		c1.gridy = ++c2.gridy;
+		JLabel a = new JLabel(strings.getString("notification.availability_lbl"));
+		// come with an eye-catching color
+		a.setForeground(Color.red);
+		p.add(a, c1);
+		p.add(new JLabel(aStr), c2);
+		
 		c1.gridy++;
 		c1.gridwidth = 2;
 		c1.weighty = 1.0;

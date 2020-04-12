@@ -18,6 +18,10 @@ import javax.swing.Timer;
 import micropolisj.engine.*;
 import static micropolisj.engine.TileConstants.*;
 import static micropolisj.gui.ColorParser.parseColor;
+import static micropolisj.engine.TileConstants.isZoneCenter;
+import static micropolisj.engine.TileConstants.isZoneAny;
+import micropolisj.gui.MainWindow;
+
 
 public class MicropolisDrawingArea extends JComponent
 	implements Scrollable, MapListener
@@ -162,6 +166,7 @@ public class MicropolisDrawingArea extends JComponent
 		}
 	}
 
+
 	public void paintComponent(Graphics gr)
 	{
 		final int width = m.getWidth();
@@ -178,6 +183,7 @@ public class MicropolisDrawingArea extends JComponent
 			for (int x = maxX-1; x >= minX; x--)
 			{
 				int cell = m.getTile(x,y);
+				
 				if (blinkUnpoweredZones &&
 					isZoneCenter(cell) &&
 					!m.isTilePowered(x, y))
@@ -210,7 +216,9 @@ public class MicropolisDrawingArea extends JComponent
 		}
 
 		if (toolCursor != null)
+			
 		{
+            
 			int x0 = toolCursor.rect.x * TILE_WIDTH;
 			int x1 = (toolCursor.rect.x + toolCursor.rect.width) * TILE_WIDTH;
 			int y0 = toolCursor.rect.y * TILE_HEIGHT;
@@ -252,18 +260,55 @@ public class MicropolisDrawingArea extends JComponent
 	{
 		ToolCursor tp = new ToolCursor();
 		tp.rect = newRect;
+
 		tp.borderColor = parseColor(
 			strings.containsKey("tool."+tool.name()+".border") ?
 			strings.getString("tool."+tool.name()+".border") :
 			strings.getString("tool.*.border")
 			);
-		tp.fillColor = parseColor(
-			strings.containsKey("tool."+tool.name()+".bgcolor") ?
-			strings.getString("tool."+tool.name()+".bgcolor") :
-			strings.getString("tool.*.bgcolor")
-			);
+		
+		if (tool.name() == "SELL") {
+			int x = newRect.x;
+			int y = newRect.y;
+			// be careful with the check boundary, easy to miss and cause bug
+			if (m.testBounds(x, y)) {
+				int cell = m.getTile(x,y);
+				// assign different color to different type of zones when hovering
+				if (isZoneAny(cell)) {
+					if (isIndustrialZone(cell)) {
+						tp.fillColor = parseColor("rgba(255,0,0,0.375)");
+					}
+					else if (isResidentialZone(cell)) {
+						tp.fillColor = parseColor("rgba(0,255,0,0.375)");
+					}
+					else if (isCommercialZone(cell)) {
+						tp.fillColor = parseColor("rgba(0,0,255,0.375)");
+					}
+					else {
+						tp.fillColor = parseColor("rgba(255,255,0,0.375)");
+					}				
+				}
+				else {
+					//tp.fillColor = parseColor("rgba(93,93,93,0.6)");
+				}
+			}
+		}
+			
+			
+		
+		
+		else {
+			tp.fillColor = parseColor(
+					strings.containsKey("tool."+tool.name()+".bgcolor") ?
+					strings.getString("tool."+tool.name()+".bgcolor") :
+					strings.getString("tool.*.bgcolor")
+					);
+		}
+		
 		setToolCursor(tp);
-	}
+	}		
+		
+
 
 	public void setToolCursor(ToolCursor newCursor)
 	{

@@ -2668,18 +2668,95 @@ public class Micropolis
 
 		z = rateOGMem[ypos/8][xpos/8];
 		z = z < 0 ? 16 : z == 0 ? 17 : z <= 100 ? 18 : 19;
-		zs.growthRate = z + 1;
+		zs.growthRate = 5*z + 1;
 		
-		z = landValueMem[ypos/2][xpos/2];
-		z = z < 30 ? 4 : z < 80 ? 5 : z < 150 ? 6 : 7;
-		int p = (popDensity[ypos/2][xpos/2]) % 4;
-		zs.sellValue = 9*p*z;
-		// I want to loop through the whole 9 tiles, but I need to study more math here.
-		//for (int i = xpos; i < xpos+1; i++) {
-			//for (int j = ypos; j < ypos+1; j++) {
-				//z += landValueMem[i][j];
-			//}
-		//}	        
+		// isZone or not
+		if (testBounds(xpos, ypos)) {
+			int cell = getTile(xpos,ypos);
+			
+			if (isZoneAny(cell)) {
+				zs.isZone = 21;
+			}
+			else {
+				zs.isZone = 22;
+			}
+		}
+		else {
+			zs.isZone = 22;
+		}
+			
+		// population
+		z = 0;
+		for (int i = xpos; i < xpos+1; i++) {
+			for (int j = ypos; j < ypos+1; j++) {
+				z += popDensity[ypos/2][xpos/2];
+			}
+		}	
+		zs.popValue = z;		
+		
+		// land value
+		z = 0;
+		for (int i = xpos; i < xpos+1; i++) {
+			for (int j = ypos; j < ypos+1; j++) {
+				int a = popDensity[ypos/2][xpos/2];
+				int b = landValueMem[j/2][i/2];
+				b = b < 30 ? 4 : b < 80 ? 5 : b < 150 ? 6 : 7;
+				b += 18;				
+				int e = rateOGMem[ypos/8][xpos/8];
+				e = e < 0 ? 16 : e == 0 ? 17 : e <= 100 ? 18 : 19;
+				e = 5*e + 1;								
+				z += a*b*e/100;
+			}
+		}	
+		zs.sellLandValue = z;
+		
+		// crime value	
+		z = 0;		
+		for (int i = xpos; i < xpos+1; i++) {
+			for (int j = ypos; j < ypos+1; j++) {
+				int a = popDensity[ypos/2][xpos/2];				
+				int c = ((crimeMem[ypos/2][xpos/2] / 64) % 4) + 8;				
+				int e = rateOGMem[ypos/8][xpos/8];
+				e = e < 0 ? 16 : e == 0 ? 17 : e <= 100 ? 18 : 19;
+				e = 5*e + 1;								
+				z += a*c*e/100;
+			}
+		}	
+		zs.crimeValue = z;		
+		
+		// pollution value
+		z = 0;
+		for (int i = xpos; i < xpos+1; i++) {
+			for (int j = ypos; j < ypos+1; j++) {
+				int a = popDensity[ypos/2][xpos/2];
+				int d = Math.max(13,((pollutionMem[ypos/2][xpos/2] / 64) % 4) + 12);
+				int e = rateOGMem[ypos/8][xpos/8];
+				e = e < 0 ? 16 : e == 0 ? 17 : e <= 100 ? 18 : 19;
+				e = 5*e + 1;								
+				z += a*d*e/100;
+			}
+		}	
+		zs.pollutionValue = z;
+		
+		//sell value
+		z = 0;
+		for (int i = xpos; i < xpos+1; i++) {
+			for (int j = ypos; j < ypos+1; j++) {
+				int a = popDensity[ypos/2][xpos/2];
+				int b = landValueMem[j/2][i/2];
+				b = b < 30 ? 4 : b < 80 ? 5 : b < 150 ? 6 : 7;
+				b += 18;
+				int c = ((crimeMem[ypos/2][xpos/2] / 64) % 4) + 8;
+				int d = Math.max(13,((pollutionMem[ypos/2][xpos/2] / 64) % 4) + 12);
+				int e = rateOGMem[ypos/8][xpos/8];
+				e = e < 0 ? 16 : e == 0 ? 17 : e <= 100 ? 18 : 19;
+				e = 5*e + 1;								
+				z += a*(b-c-d)*e/100;
+			}
+		}	
+		zs.sellTotalValue = z;
+		
+	
 		return zs;
 	}
 

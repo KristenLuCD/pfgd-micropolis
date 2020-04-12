@@ -8,6 +8,9 @@
 
 package micropolisj.gui;
 
+import static micropolisj.engine.TileConstants.isZoneCenter;
+import static micropolisj.engine.TileConstants.isZoneAny;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -31,6 +34,7 @@ public class MainWindow extends JFrame
 	MicropolisDrawingArea drawingArea;
 	JScrollPane drawingAreaScroll;
 	DemandIndicator demandInd;
+	MainWindow mainwindow;
 	MessagesPane messagesPane;
 	JLabel mapLegendLbl;
 	OverlayMapView mapView;
@@ -318,6 +322,7 @@ public class MainWindow extends JFrame
 			startTimer();
 		}
 	}
+	
 
 	boolean needsSaved()
 	{
@@ -1120,7 +1125,7 @@ public class MainWindow extends JFrame
 			return;
 
 		ZoneStatus z = engine.queryZoneStatus(xpos, ypos);
-		notificationPane.showZoneValues(engine, xpos, ypos, z);		
+		notificationPane.showZoneValues(engine, mainwindow, xpos, ypos, z);		
 	}
 
 
@@ -1189,14 +1194,21 @@ public class MainWindow extends JFrame
 		CityLocation loc = drawingArea.getCityLocation(ev.getX(), ev.getY());
 		int x = loc.x;
 		int y = loc.y;
+		
+		if (engine.testBounds(x, y) == false) {
+			toolStroke = null;
+			drawingArea.setToolPreview(null);
+			drawingArea.setToolCursor(null);
+		}
+				
 
 		if (currentTool == MicropolisTool.QUERY) {
 			doQueryTool(x, y);
 			this.toolStroke = null;
 		}
+		// click on map 
 		else if (currentTool == MicropolisTool.SELL) {
-			//doSellTool(x, y);
-			this.toolStroke = currentTool.beginStroke(engine, x, y);// finally find out the bug...
+			this.toolStroke = currentTool.beginStroke(engine, x, y);
 			previewTool();
 		}
 		else {
@@ -1294,8 +1306,10 @@ public class MainWindow extends JFrame
 		int x = loc.x;
 		int y = loc.y;
 		
-		if (currentTool == MicropolisTool.SELL) {
-			doSellTool(x, y);
+		if (engine.testBounds(x, y) == false) {
+			toolStroke = null;
+			drawingArea.setToolPreview(null);
+			drawingArea.setToolCursor(null);
 		}
 		
 		int w = currentTool.getWidth();
@@ -1305,8 +1319,15 @@ public class MainWindow extends JFrame
 			x--;
 		if (h >= 3)
 			y--;
-
+	
+		// implement the sale version of notification panel
+		if (currentTool == MicropolisTool.SELL) {
+			doSellTool(x, y);
+		}
+		
+				
 		drawingArea.setToolCursor(new CityRect(x,y,w,h), currentTool);
+		
 	}
 
 	private void onToolExited(MouseEvent ev)

@@ -8,6 +8,9 @@
 
 package micropolisj.engine;
 
+import micropolisj.gui.MainWindow;
+
+
 /**
  * Enumerates the various tools that can be applied to the map by the user.
  * Call the tool's apply() method to actually use the tool on the map.
@@ -70,9 +73,10 @@ public enum MicropolisTool
 		case NUCLEAR:
 		case AIRPORT:			
 			return new BuildingTool(engine, this, xpos, ypos);
-		
+		// connect the Tool to the real function
 		case SELL:
 			return new Seller(engine, xpos, ypos);
+			
 		
 		default:
 			return new ToolStroke(engine, this, xpos, ypos);
